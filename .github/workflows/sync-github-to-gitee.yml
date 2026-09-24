@@ -1,0 +1,35 @@
+name: sync-github-to-gitee
+
+on:
+  schedule:
+    - cron: '27 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-gitee
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bare clone upstream from GitHub
+        run: |
+          set -euo pipefail
+          git clone --bare https://github.com/jwoglom/pumpX2.git mirror
+          cd mirror
+          git fetch origin '+refs/heads/*:refs/heads/*' --tags --prune --force
+
+      - name: Push mirror to Gitee
+        working-directory: mirror
+        env:
+          GITEE_USERNAME: ${{ secrets.GITEE_USERNAME }}
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          set -euo pipefail
+          git remote add gitee "https://${GITEE_USERNAME}:${GITEE_TOKEN}@gitee.com/pumppan/pump-x2.git"
+          git push gitee --force refs/heads/main:refs/heads/main refs/heads/dev:refs/heads/dev
+          git push gitee --tags --force
