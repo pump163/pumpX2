@@ -1,8 +1,11 @@
 name: sync-github-to-gitee
 
+# 将上游 jwoglom/pumpX2 纯镜像同步到 Gitee（只读支持库，镜像 main/dev/tags）
+# schedule 为美国东部时间 03:30：夏令时 EDT(UTC-4) = UTC 07:30；
+# 冬令时 EST 期间实际为美东 02:30（GitHub cron 固定 UTC，不随 DST 自动调整）
 on:
   schedule:
-    - cron: '27 16 * * *'
+    - cron: '30 7 * * *'
   workflow_dispatch:
 
 permissions:
